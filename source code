@@ -1,0 +1,115 @@
+#include <GL/glut.h>
+
+float rtri = 0.0f;  // Rotation angle for the pyramid
+float xPos = -1.5f, yPos = 0.0f, zPos = -6.0f;  // Position of the pyramid
+float scale = 1.0f;  // Scale factor for the pyramid
+
+// Function to initialize OpenGL settings
+void initOpenGL() {
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set the background color to black
+    glEnable(GL_DEPTH_TEST);  // Enable depth testing for 3D rendering
+    glMatrixMode(GL_PROJECTION);  // Set the projection matrix mode
+    glLoadIdentity();  // Reset the projection matrix
+    gluPerspective(45.0f, 1.0f, 0.1f, 100.0f);  // Set up the perspective projection
+    glMatrixMode(GL_MODELVIEW);  // Switch to the modelview matrix
+}
+
+// Function to draw the scene
+void DrawGLScene(void) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen and depth buffer
+    glLoadIdentity();  // Reset the view
+
+    // Move the camera to simulate the viewpoint
+    glTranslatef(xPos, yPos, zPos);  // Apply translation to the camera's position
+
+    // Apply transformations (scaling, rotation)
+    glScalef(scale, scale, scale);  // Apply scaling
+    glRotatef(rtri, 0.0f, 1.0f, 0.0f);  // Rotate the pyramid around the Y-axis
+
+    // Draw the pyramid
+    glBegin(GL_TRIANGLES);  // Start drawing triangles
+
+    // Front face
+    glColor3f(1.0f, 0.0f, 0.0f);  // Red color
+    glVertex3f(0.0f, 1.0f, 0.0f);  // Top point
+    glVertex3f(-1.0f, -1.0f, 1.0f);  // Bottom left
+    glVertex3f(1.0f, -1.0f, 1.0f);  // Bottom right
+
+    // Right face
+    glColor3f(0.0f, 1.0f, 0.0f);  // Green color
+    glVertex3f(0.0f, 1.0f, 0.0f);  // Top point
+    glVertex3f(1.0f, -1.0f, 1.0f);  // Bottom right
+    glVertex3f(1.0f, -1.0f, -1.0f);  // Bottom left
+
+    // Back face
+    glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
+    glVertex3f(0.0f, 1.0f, 0.0f);  // Top point
+    glVertex3f(1.0f, -1.0f, -1.0f);  // Bottom right
+    glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom left
+
+    // Left face
+    glColor3f(1.0f, 1.0f, 0.0f);  // Yellow color
+    glVertex3f(0.0f, 1.0f, 0.0f);  // Top point
+    glVertex3f(-1.0f, -1.0f, -1.0f);  // Bottom left
+    glVertex3f(-1.0f, -1.0f, 1.0f);  // Bottom right
+
+    glEnd();  // End drawing
+
+    glutSwapBuffers();  // Swap buffers to display the scene
+}
+
+// Function to handle keyboard input
+void keyPressed(unsigned char key, int x, int y) {
+    if (key == 'w') {  // Move forward
+        zPos += 0.1f;
+    }
+    else if (key == 's') {  // Move backward
+        zPos -= 0.1f;
+    }
+    else if (key == 'a') {  // Move left
+        xPos -= 0.1f;
+    }
+    else if (key == 'd') {  // Move right
+        xPos += 0.1f;
+    }
+    else if (key == 'r') {  // Move up
+        yPos += 0.1f;
+    }
+    else if (key == 'f') {  // Move down
+        yPos -= 0.1f;
+    }
+    else if (key == 'q') {  // Increase scale
+        scale += 0.1f;
+    }
+    else if (key == 'e') {  // Decrease scale
+        scale -= 0.1f;
+    }
+}
+
+// Function to update the rotation angle
+void update(int value) {
+    rtri += 2.0f;  // Increment rotation angle
+    if (rtri > 360) {
+        rtri -= 360;  // Keep the angle within 0-360 range
+    }
+    glutPostRedisplay();  // Redisplay the scene
+    glutTimerFunc(16, update, 0);  // Set up the next update
+}
+
+// Main function
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("OpenGL 3D Transformations");
+
+    initOpenGL();  // Initialize OpenGL settings
+
+    glutDisplayFunc(DrawGLScene);  // Set the drawing function
+    glutKeyboardFunc(keyPressed);  // Set the keyboard input function
+    glutTimerFunc(25, update, 0);  // Set the rotation update function
+
+    glutMainLoop();  // Enter the GLUT main loop
+
+    return 0;
+}
